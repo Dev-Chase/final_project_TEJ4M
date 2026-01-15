@@ -1,0 +1,91 @@
+import cv2
+import os
+# import picamera2
+import pickle
+import sys
+import time
+
+CV_SCALER = 5
+
+# TODO: Separate files according to these categories:
+# The CLI, the inital image capturing, the model training, the verification of a person, hardware interaction (this last one can be incoporated into others if necessary), CSV or cloud stuff if being done
+
+# Camera and General Running
+# TODO: handle the case where there aren't any in program flow (should most likely be handled by CLI portion)
+def load_encodings():
+    print("[INFO] loading encodings...")
+    with open("encodings.pickle", "rb") as f:
+        data = pickle.loads(f.read())
+    return data["encodings"], data["names"]
+
+# TODO: keep track of whether camera is initialized or not
+def init_camera():
+    # Initialize the camera
+    # For Raspberry Pi:
+    # picam2 = Picamera2()
+    # picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (1920, 1080)}))
+    # picam2.start()
+    # time.sleep(2)
+
+    # return picam2
+
+    # For MACos:
+    cam = cv2.VideoCapture(int(input("What camera index are you using? (0 for plugged-in webcam, 1 for built-in): ")))
+    if not cam.isOpened():
+        print("Cannot open camera")
+        sys.exit()
+
+    return cam
+
+def capture_frame(cam):
+    # For MACos:
+    ret, frame = cam.read()
+    if not ret:
+        print("Failed to grab frame")
+        sys.exit()
+
+    return frame
+
+    # For Raspberry Pi:
+    # frame = picam2.capture_array()
+    # return frame
+
+# Returns frame_count, start_time, fps
+def calculate_fps(frame_count, start_time, fps):
+    frame_count = frame_count + 1
+    elapsed_time = time.time() - start_time
+    if elapsed_time > 1:
+        fps = frame_count / elapsed_time
+        frame_count = 0
+        start_time = time.time()
+    return frame_count, start_time, fps
+
+def clear_console():
+    if os.name == 'nt':
+        _ = os.system('cls')
+    else:
+        _ = os.system('clear')
+
+# Drawing
+def draw_results(frame, cv_scaler, face_locations, face_names):
+    # Display the results
+    for (top, right, bottom, left), name in zip(face_locations, face_names):
+        # Scale back up face locations since the frame we detected in was scaled
+        top *= cv_scaler
+        right *= cv_scaler
+        bottom *= cv_scaler
+        left *= cv_scaler
+        
+        # Draw a box around the face
+        cv2.rectangle(frame, (left, top), (right, bottom), (244, 42, 3), 3)
+        
+        # Draw a label with a name below the face
+        cv2.rectangle(frame, (left -3, top - 35), (right+3, top), (244, 42, 3), cv2.FILLED)
+        font = cv2.FONT_HERSHEY_DUPLEX
+        cv2.putText(frame, name, (left + 6, top - 6), font, 1.0, (255, 255, 255), 1)
+
+
+def draw_fps(display_frame, fps):
+    # Attach FPS counter to the text and boxes
+    cv2.putText(display_frame, f"FPS: {fps:.1f}", (display_frame.shape[1] - 150, 30), 
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
