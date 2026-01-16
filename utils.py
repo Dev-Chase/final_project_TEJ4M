@@ -11,14 +11,15 @@ CV_SCALER = 5
 # The CLI, the inital image capturing, the model training, the verification of a person, hardware interaction (this last one can be incoporated into others if necessary), CSV or cloud stuff if being done
 
 # Camera and General Running
-# TODO: handle the case where there aren't any in program flow (should most likely be handled by CLI portion)
-def load_encodings():
-    print("[INFO] loading encodings...")
-    with open("encodings.pickle", "rb") as f:
-        data = pickle.loads(f.read())
-    return data["encodings"], data["names"]
+def load_encodings(known_face_encodings, known_face_names):
+    if not known_face_encodings or not known_face_names:
+        print("[INFO] loading encodings...")
+        with open("encodings.pickle", "rb") as f:
+            data = pickle.loads(f.read())
+        return data["encodings"], data["names"]
 
-# TODO: keep track of whether camera is initialized or not
+    return known_face_encodings, known_face_names
+
 def init_camera():
     # Initialize the camera
     # For Raspberry Pi:

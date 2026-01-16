@@ -33,25 +33,19 @@ def process_frame(frame, known_face_encodings, known_face_names, cv_scaler = CV_
     return face_locations, face_encodings, face_names
 
 def get_current_person(cam, known_face_encodings, known_face_names):
+    known_face_encodings, known_face_names = load_encodings(known_face_encodings, known_face_names)
     start_time = time.time()
 
     # Get and process the current frame
-    ret, frame = cam.read()
-    if not ret:
-        print("Failed to grab frame")
-        return None
+    frame = capture_frame(cam)
     _, _, face_names = process_frame(frame, known_face_encodings, known_face_names)
+
     print(f"Original names: {face_names}")
     last_face_names = face_names
 
     while time.time() - start_time < VERIFICATION_TIME:
-        # Capture a frame from camera
-        ret, frame = cam.read()
-        if not ret:
-            print("Failed to grab frame")
-            return None
-
-        # Process Frame
+        # Get and process the current frame
+        frame = capture_frame(cam)
         _, _, face_names = process_frame(frame, known_face_encodings, known_face_names)
         print(face_names)
 

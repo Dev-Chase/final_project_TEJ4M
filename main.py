@@ -4,7 +4,7 @@ from processing import get_current_person
 
 if __name__ == "__main__":
     # Load pre-trained face encodings
-    known_face_encodings, known_face_names = load_encodings()
+    known_face_encodings, known_face_names = load_encodings(None, None)
 
     # Initialize Camera
     cam = init_camera()
