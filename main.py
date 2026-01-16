@@ -27,6 +27,7 @@ if __name__ == "__main__":
             elif inp == "train":
                 cam = clean_up(cam)
                 train_model()
+                known_face_encodings, known_face_names = load_encodings(known_face_names, known_face_encodings, True)
             elif inp == "reco" or inp == "recognize":
                 current_person = get_current_person(cam, CAM_I, known_face_encodings, known_face_names)
                 print(f"Current Person is {current_person}")
