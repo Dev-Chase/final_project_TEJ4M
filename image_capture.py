@@ -12,7 +12,9 @@ def create_folder(name):
         os.makedirs(person_folder)
     return person_folder
 
-def capture_photos(cam):
+def capture_photos(cam, CAM_I):
+    cam = init_camera(cam, CAM_I)
+
     # Name will be formated as firstname_lastname in lowercase
     name = "_".join(part.lower() for part in input("What is your full name?: ").split())
     folder = create_folder(name)
@@ -20,11 +22,11 @@ def capture_photos(cam):
     photo_count = 0
     
     while True:
-        # Capture frame from Pi Camera
-        frame = capture_frame(cam)
+        # Capture frame from Camera
+        frame = capture_frame(cam, CAM_I)
         
         # Display the frame
-        cv2.imshow('Capture', frame)
+        cv2.imshow("Capture", frame)
         
         key = cv2.waitKey(1) & 0xFF
         

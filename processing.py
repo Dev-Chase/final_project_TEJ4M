@@ -7,6 +7,8 @@ VERIFICATION_TIME = 4.0 # seconds
 # NOTE: Returns face_locations, face_encodings, and face_names
 # cv_scaler must be a whole number
 def process_frame(frame, known_face_encodings, known_face_names, cv_scaler = CV_SCALER):
+    known_face_encodings, known_face_names = load_encodings(known_face_encodings, known_face_names, False)
+
     # Resize the frame using cv_scaler to increase performance (less pixels processed, less time spent)
     resized_frame = cv2.resize(frame, (0, 0), fx = (1/cv_scaler), fy = (1/cv_scaler))
     
@@ -32,12 +34,12 @@ def process_frame(frame, known_face_encodings, known_face_names, cv_scaler = CV_
 
     return face_locations, face_encodings, face_names
 
-def get_current_person(cam, known_face_encodings, known_face_names):
-    known_face_encodings, known_face_names = load_encodings(known_face_encodings, known_face_names)
+def get_current_person(cam, CAM_I, known_face_encodings, known_face_names):
+    cam = init_camera(cam, CAM_I)
     start_time = time.time()
 
     # Get and process the current frame
-    frame = capture_frame(cam)
+    frame = capture_frame(cam, CAM_I)
     _, _, face_names = process_frame(frame, known_face_encodings, known_face_names)
 
     print(f"Original names: {face_names}")
@@ -45,21 +47,21 @@ def get_current_person(cam, known_face_encodings, known_face_names):
 
     while time.time() - start_time < VERIFICATION_TIME:
         # Get and process the current frame
-        frame = capture_frame(cam)
+        frame = capture_frame(cam, CAM_I)
         _, _, face_names = process_frame(frame, known_face_encodings, known_face_names)
         print(face_names)
 
         # Check for invalidations of the current verification
         if len(face_names) == 0:
-            print("No one is detected in the frame at the moment, cancelling")
+            print("I couldn't detect anyone in the frame.")
             return None
 
         if len(face_names) > 1:
-            print("More than one person detected in the current frame, cancelling")
+            print("Only one person in frame at a time please.")
             return None
 
         if last_face_names != face_names:
-            print("People in frame have changed since last frame, cancelling")
+            print("Something changed while I was verifying, please try again.")
             return None
 
         last_face_names = face_names

@@ -4,6 +4,7 @@ import face_recognition
 import pickle
 import cv2
 
+# TODO: consider finding a way to only train new pictures instead of everything
 def train_model():
     print("[INFO] start processing faces...")
     imagePaths = list(paths.list_images("dataset"))
