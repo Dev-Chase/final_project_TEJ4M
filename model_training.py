@@ -1,5 +1,6 @@
 import os
 from imutils import paths
+from pathlib import Path
 import face_recognition
 import pickle
 import cv2
@@ -12,7 +13,8 @@ def train_model():
     knownNames = []
 
     for (i, imagePath) in enumerate(imagePaths):
-        print(f"[INFO] processing image {i + 1}/{len(imagePaths)}")
+        pathlib_path = Path(imagePath)
+        print(f"[INFO] processing image {i + 1}/{len(imagePaths)} (for {pathlib_path.parent.name})")
         name = imagePath.split(os.path.sep)[-2]
         
         image = cv2.imread(imagePath)

@@ -36,6 +36,7 @@ def process_frame(frame, known_face_encodings, known_face_names, cv_scaler = CV_
 
 def get_current_person(cam, CAM_I, known_face_encodings, known_face_names):
     cam = init_camera(cam, CAM_I)
+    time.sleep(1.0)
     start_time = time.time()
 
     # Get and process the current frame
