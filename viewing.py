@@ -25,16 +25,16 @@ def draw_fps(display_frame, fps):
     cv2.putText(display_frame, f"FPS: {fps:.1f}", (display_frame.shape[1] - 150, 30), 
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-def live_preview(cam, CAM_I, known_face_encodings, known_face_names, cv_scaler = CV_SCALER):
-    known_face_encodings, known_face_names = load_encodings(known_face_encodings, known_face_names, False)
+def live_preview(cam, CAM_I, known_face_encodings, known_face_names, known_face_ids, cv_scaler = CV_SCALER):
+    known_face_encodings, known_face_names, known_face_ids = load_encodings(known_face_encodings, known_face_names, known_face_ids, False)
     cam = init_camera(cam, CAM_I)
 
     while True:
         # Capture frame from Camera
         frame = capture_frame(cam, CAM_I)
 
-        face_locations, face_encodings, face_names = process_frame(frame, known_face_encodings, known_face_names)
-        draw_results(frame, face_locations, face_names)
+        face_locations, _, face_names = process_frame(frame, known_face_encodings, known_face_names, known_face_ids, cv_scaler)
+        draw_results(frame, face_locations, face_names, cv_scaler)
         
         # Display the frame
         cv2.imshow("Preview", frame)

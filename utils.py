@@ -6,19 +6,22 @@ import sys
 import time
 
 CV_SCALER = 5
+ENCODINGS_FILE_PATH = "encodings.pickle"
+
+#TODO: consider using classes
 
 # TODO: Separate files according to these categories:
 # The CLI, the inital image capturing, the model training, the verification of a person, hardware interaction (this last one can be incoporated into others if necessary), CSV or cloud stuff if being done
 
 # Camera and General Running
-def load_encodings(known_face_encodings, known_face_names, override):
-    if not known_face_encodings or not known_face_names or override:
+def load_encodings(known_face_encodings, known_face_names, known_face_ids, override):
+    if not known_face_encodings or not known_face_names or not known_face_ids or override:
         print("[INFO] loading encodings...")
-        with open("encodings.pickle", "rb") as f:
+        with open(ENCODINGS_FILE_PATH, "rb") as f:
             data = pickle.loads(f.read())
-        return data["encodings"], data["names"]
+        return data["encodings"], data["names"], data["ids"]
 
-    return known_face_encodings, known_face_names
+    return known_face_encodings, known_face_names, known_face_ids
 
 def init_camera(cam, CAM_I):
     if not (not cam):
