@@ -14,14 +14,14 @@ ENCODINGS_FILE_PATH = "encodings.pickle"
 # The CLI, the inital image capturing, the model training, the verification of a person, hardware interaction (this last one can be incoporated into others if necessary), CSV or cloud stuff if being done
 
 # Camera and General Running
-def load_encodings(known_face_encodings, known_face_names, known_face_ids, override):
-    if not known_face_encodings or not known_face_names or not known_face_ids or override:
+def load_encodings(known_people=None, override=False):
+    if not known_people or override:
         print("[INFO] loading encodings...")
         with open(ENCODINGS_FILE_PATH, "rb") as f:
             data = pickle.loads(f.read())
-        return data["encodings"], data["names"], data["ids"]
+        return data["people"]
 
-    return known_face_encodings, known_face_names, known_face_ids
+    return known_people
 
 def init_camera(cam, CAM_I):
     if not (not cam):

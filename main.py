@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # Load pre-trained face encodings
     if not Path(ENCODINGS_FILE_PATH).is_file():
         train_model()
-    known_face_encodings, known_face_names, known_face_ids = load_encodings(None, None, None, True)
+    known_people = load_encodings(None, True)
 
     # Initialize Hardware/GPIO
     hardware = Hardware(testing=True) # TODO: remove testing for raspberry pi
@@ -48,16 +48,17 @@ if __name__ == "__main__":
             elif inp == "capture" or inp == "capt":
                 capture_photos(cam, CAM_I, hardware)
                 cam = clean_up(cam) # TODO: review if cam is mutable and altered by clean_up for both rpi and macOS (so that clean_up can be done from any function and not in the main one)
+                print("Enter 'train' to train the model on the pictures")
             elif inp == "train":
                 cam = clean_up(cam)
                 train_model()
-                known_face_encodings, known_face_names, known_face_ids = load_encodings(known_face_names, known_face_encodings,known_face_ids, True)
+                known_people = load_encodings(known_people, True)
             elif inp == "reco" or inp == "recognize":
-                current_person = get_current_person(cam, CAM_I, hardware, known_face_encodings, known_face_names, known_face_ids)
+                current_person = get_current_person(cam, CAM_I, hardware, known_people)
                 print(f"Current Person is {current_person}")
             elif inp == "preview" or inp == "prev":
                 # Get and process frame
-                live_preview(cam, CAM_I,  known_face_encodings, known_face_names, known_face_ids, cv_scaler)
+                live_preview(cam, CAM_I,  known_people, cv_scaler)
                 cam = clean_up(cam)
             elif inp == "clean":
                 cam = clean_up(cam)

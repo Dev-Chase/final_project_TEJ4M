@@ -1,14 +1,17 @@
 import face_recognition
 import numpy as np
 from utils import *
+import uuid
 
 VERIFICATION_TIME = 4.0 # seconds
 VERIFICATION_CV_SCALER = 2
 
+# TODO: reorganize so it goes through person at a time instead of encoding
+
 # NOTE: Returns face_locations, face_encodings, and face_names
 # cv_scaler must be a whole number
-def process_frame(frame, known_face_encodings, known_face_names, known_face_ids, cv_scaler = CV_SCALER):
-    known_face_encodings, known_face_names, known_face_ids = load_encodings(known_face_encodings, known_face_names, known_face_ids, False)
+def process_frame(frame, known_people, cv_scaler = CV_SCALER):
+    known_people = load_encodings(known_people)
 
     # Resize the frame using cv_scaler to increase performance (less pixels processed, less time spent)
     resized_frame = cv2.resize(frame, (0, 0), fx = (1/cv_scaler), fy = (1/cv_scaler))
@@ -20,57 +23,65 @@ def process_frame(frame, known_face_encodings, known_face_names, known_face_ids,
     face_locations = face_recognition.face_locations(rgb_resized_frame)
     face_encodings = face_recognition.face_encodings(rgb_resized_frame, face_locations, model='large')
     
-    face_names = []
+    face_people = []
     for face_encoding in face_encodings:
-        # See if the face is a match for the known face(s)
-        matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-        name = "unknown"
+        tolerance = 0.6
+
+        # Find the person with the closest looking face
+        lowest_distance = tolerance + 0.1
+        current_match = {"id": uuid.UUID(int=0x00000000000000000000000000000000), "name": "Threat"}
+        for person in known_people:
+            person_min_distance = min(face_recognition.face_distance(person["encodings"], face_encoding))
+            if person_min_distance < lowest_distance:
+                lowest_distance = person_min_distance
+                current_match = {"id": person["id"], "name": person["name"]}
+
+
+        # Compare the closest looking face to the tolerance
+        if lowest_distance > tolerance:
+            current_match = {"id": uuid.UUID(int=0x00000000000000000000000000000000), "name": "Unknown"}
         
         # Use the known face with the smallest distance to the new face
-        face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
-        best_match_index = np.argmin(face_distances)
-        if matches[best_match_index]:
-            name = known_face_names[best_match_index]
-        face_names.append(name)
+        face_people.append(current_match)
 
-    return face_locations, face_encodings, face_names
+    return face_locations, face_encodings, face_people
 
-def get_current_person(cam, CAM_I, hardware, known_face_encodings, known_face_names, known_face_ids, cv_scaler=VERIFICATION_CV_SCALER):
+def get_current_person(cam, CAM_I, hardware, known_people, cv_scaler=VERIFICATION_CV_SCALER):
     cam = init_camera(cam, CAM_I)
     time.sleep(1.0)
     start_time = time.time()
 
     # Get and process the current frame
     frame = capture_frame(cam, CAM_I)
-    _, _, face_names = process_frame(frame, known_face_encodings, known_face_names, known_face_ids, cv_scaler)
+    _, _, face_people = process_frame(frame, known_people, cv_scaler)
 
-    print(f"Original names: {face_names}")
-    last_face_names = face_names
+    print(f"Original People: {face_people}")
+    last_face_people = face_people
 
     while time.time() - start_time < VERIFICATION_TIME:
         # Get and process the current frame
         frame = capture_frame(cam, CAM_I)
-        _, _, face_names = process_frame(frame, known_face_encodings, known_face_names, known_face_ids, cv_scaler)
-        print(face_names)
+        _, _, face_people = process_frame(frame, known_people, cv_scaler)
+        print(face_people)
 
         # Check for invalidations of the current verification
-        if len(face_names) == 0:
+        if len(face_people) == 0:
             print("I couldn't detect anyone in the frame.")
             hardware.fail_sound()
             return None
 
-        if len(face_names) > 1:
+        if len(face_people) > 1:
             print("Only one person in frame at a time please.")
             hardware.fail_sound()
             return None
 
-        if last_face_names != face_names:
+        if last_face_people != face_people:
             print("Something changed while I was verifying, please try again.")
             hardware.fail_sound()
             return None
 
-        last_face_names = face_names
+        last_face_people = face_people
 
     hardware.set_lights(False, True)
     hardware.success_sound()
-    return face_names[0]
+    return face_people[0]
