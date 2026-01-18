@@ -14,7 +14,11 @@ ENCODINGS_FILE_PATH = "encodings.pickle"
 # The CLI, the inital image capturing, the model training, the verification of a person, hardware interaction (this last one can be incoporated into others if necessary), CSV or cloud stuff if being done
 
 # Camera and General Running
-def load_encodings(known_people=None, override=False):
+def create_folder(folder_path):
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+def load_people(known_people=None, override=False):
     if not known_people or override:
         print("[INFO] loading encodings...")
         with open(ENCODINGS_FILE_PATH, "rb") as f:

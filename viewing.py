@@ -26,7 +26,7 @@ def draw_fps(display_frame, fps):
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
 def live_preview(cam, CAM_I, known_people, cv_scaler = CV_SCALER):
-    known_people = load_encodings(known_people)
+    known_people = load_people(known_people)
     cam = init_camera(cam, CAM_I)
 
     while True:

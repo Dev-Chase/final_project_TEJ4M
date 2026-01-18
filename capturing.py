@@ -1,16 +1,14 @@
 from datetime import datetime
-from hardware import Hardware
 import os
 from utils import *
 
-def create_folder(name):
+# TODO: move to person.py
+def create_person_folder(name):
     dataset_folder = "dataset"
-    if not os.path.exists(dataset_folder):
-        os.makedirs(dataset_folder)
+    create_folder(dataset_folder)
     
     person_folder = os.path.join(dataset_folder, name)
-    if not os.path.exists(person_folder):
-        os.makedirs(person_folder)
+    create_folder(person_folder)
     return person_folder
 
 def capture_photos(cam, CAM_I, hardware):
@@ -18,7 +16,12 @@ def capture_photos(cam, CAM_I, hardware):
 
     # Name will be formated as firstname_lastname in lowercase
     name = "_".join(part.lower() for part in input("What is your full name?: ").split())
-    folder = create_folder(name)
+    
+    titles = ["threat", "student", "teacher", "other"]
+    title_i = int(input("What is this person's title/status (0:threat, 1:student, 2:teacher, 3:other)?: "))
+    title = titles[title_i]
+
+    folder = create_person_folder(name)
     print(f"Taking photos for {name}. Press SPACE to capture, 'q' to quit.")
     photo_count = 0
     

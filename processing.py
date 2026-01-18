@@ -1,7 +1,5 @@
 import face_recognition
-import numpy as np
 from utils import *
-import uuid
 
 VERIFICATION_TIME = 4.0 # seconds
 VERIFICATION_CV_SCALER = 2
@@ -11,7 +9,7 @@ VERIFICATION_CV_SCALER = 2
 # NOTE: Returns face_locations, face_encodings, and face_names
 # cv_scaler must be a whole number
 def process_frame(frame, known_people, cv_scaler = CV_SCALER):
-    known_people = load_encodings(known_people)
+    known_people = load_people(known_people)
 
     # Resize the frame using cv_scaler to increase performance (less pixels processed, less time spent)
     resized_frame = cv2.resize(frame, (0, 0), fx = (1/cv_scaler), fy = (1/cv_scaler))

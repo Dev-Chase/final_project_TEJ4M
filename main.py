@@ -10,6 +10,7 @@ def print_options():
     print("Options:")
     print("ls/list - List options")
     print("cv - Set the CV Scaler (how much the image is scaled down)")
+    print("people - See the currently saved people")
     print("capt(ure) - Take photos for a person to train the model on their face")
     print("train - Train the model on the faces in the dataset folder")
     print("reco(gnize) - Validate a person in frame")
@@ -22,7 +23,8 @@ if __name__ == "__main__":
     # Load pre-trained face encodings
     if not Path(ENCODINGS_FILE_PATH).is_file():
         train_model()
-    known_people = load_encodings(None, True)
+    known_people = load_people(None, True)
+    # TODO: handle people_data as seen in training.py
 
     # Initialize Hardware/GPIO
     hardware = Hardware(testing=True) # TODO: remove testing for raspberry pi
@@ -45,6 +47,9 @@ if __name__ == "__main__":
             elif inp == "cv":
                 cv_scaler = int(input("What do you want to set the CV Scaler to? (must be a whole number): "))
                 print(f"Set CV Scaler to {cv_scaler}")
+            elif inp == "people":
+                known_people = load_people(known_people)
+                print()
             elif inp == "capture" or inp == "capt":
                 capture_photos(cam, CAM_I, hardware)
                 cam = clean_up(cam) # TODO: review if cam is mutable and altered by clean_up for both rpi and macOS (so that clean_up can be done from any function and not in the main one)
@@ -52,7 +57,7 @@ if __name__ == "__main__":
             elif inp == "train":
                 cam = clean_up(cam)
                 train_model()
-                known_people = load_encodings(known_people, True)
+                known_people = load_people(known_people, True)
             elif inp == "reco" or inp == "recognize":
                 current_person = get_current_person(cam, CAM_I, hardware, known_people)
                 print(f"Current Person is {current_person}")
