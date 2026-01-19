@@ -33,7 +33,14 @@ def live_preview(cam, CAM_I, known_people, cv_scaler = CV_SCALER):
         frame = capture_frame(cam, CAM_I)
 
         face_locations, _, face_people = process_frame(frame, known_people, cv_scaler)
-        draw_results(frame, face_locations, [person.get_full_name_text() for person in face_people], cv_scaler)
+        names = []
+        for person in face_people:
+            if person:
+                names.append(person.get_full_name_text())
+            else:
+                names.append("Unknown")
+
+        draw_results(frame, face_locations, names, cv_scaler)
         
         # Display the frame
         cv2.imshow("Preview", frame)

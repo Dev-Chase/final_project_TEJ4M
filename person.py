@@ -3,13 +3,13 @@ import pickle
 from utils import *
 
 class Person:
-    def __init__(self, aggregate_name, titles=[], encodings=[]):
+    def __init__(self, aggregate_name, info=[], encodings=[]):
         self.aggregate_name = aggregate_name
         self.first_name, self.last_name = self.get_separate_names()
-        self.titles = titles
+        self.info = info
         self.encodings = encodings
 
-    # File Managment
+    # Data Management
     @staticmethod
     def load_people_from_file(people_arr):
         print("[INFO] loading people...")
@@ -28,16 +28,30 @@ class Person:
         print("[INFO] adding encodings to associated people")
         for person_dict in encodings_data["encodings"]:
             name = person_dict["name"]
-            matching_i, person = Person.get_person(known_people, name)
+            person = Person.get_person(known_people, name)
             if not person:
-                print("There were images saved for someone who wasn't yet saved, so I added them.")
-                matching_i = len(known_people)
-                known_people.append(Person(name))
+                print(f"I made a new person entry for {name}, since there wasn't one already.")
+                person = Person(name)
+                known_people.append(person)
 
             if override:
-                known_people[matching_i].set_encodings(person_dict["encodings"])
+                person.encodings = person_dict["encodings"]
             else:
-                known_people[matching_i].add_encodings(person_dict["encodings"])
+                person.encodings = person.encodings + person_dict["encodings"]
+
+    def get_person_dict(self):
+        return {"name": self.aggregate_name, "info": self.info}
+
+    # NOTE: overwrites current people data (assuming that changes aren't made mid execution that aren't reflected in the program's representation of the data)
+    @staticmethod
+    def save_people_to_file(people):
+        people_data = {"people": []}
+        for person in people:
+            people_data["people"].append(person.get_person_dict())
+
+        print(f"[INFO] saving people information to {PEOPLE_DATA_FILE}")
+        with open(PEOPLE_DATA_FILE, "wb") as f:
+            f.write(pickle.dumps(people_data))
 
     # Names
     @staticmethod
@@ -57,28 +71,18 @@ class Person:
     # Helper
     @staticmethod
     def get_person(people, name):
-        for person_i, person in enumerate(people):
+        for person in people:
             if person.has_same_name(name):
-                return person_i, person
+                return person
         
-        return -1, None
+        return None
+
+    def print_info(self):
+        print(f"Name:{self.get_full_name_text()}")
+        print(f"Info: {self.info}")
 
     # Titles
 
     # Pictures
     def take_pictures(self, cam, CAM_I, hardware):
         capture_photos(self.aggregate_name, cam, CAM_I, hardware)
-
-    # Encodings
-    def set_encodings(self, new_encodings):
-        self.encodings = new_encodings
-
-    def add_encodings(self, new_encodings):
-        self.encodings = self.encodings + new_encodings
-        
-    # def get_dict(self):
-    #     dict = {"name": self.aggregate_name}
-    #     for title in self.titles:
-    #         dict[title] = True
-    #
-    #     return dict

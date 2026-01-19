@@ -22,14 +22,14 @@ def print_options():
 
 if __name__ == "__main__":
     # Get Information on People
-    known_people = []
+    people = []
     if Path(PEOPLE_DATA_FILE).is_file():
-        Person.load_people_from_file(known_people)
+        Person.load_people_from_file(people)
 
     # Load pre-trained face encodings
     if not Path(ENCODINGS_FILE).is_file():
         train_model()
-    Person.load_encodings(known_people)
+    Person.load_encodings(people)
 
     # Initialize Hardware/GPIO
     hardware = Hardware(testing=True) # TODO: remove testing for raspberry pi
@@ -40,6 +40,7 @@ if __name__ == "__main__":
 
     cv_scaler = CV_SCALER
     # TODO: add option for replacing a person/updating their photos and/or deleting a person from the dataset
+    # NOTE: it would have to retrain the model afterwards
 
     # Input Loop
     try:
@@ -53,31 +54,36 @@ if __name__ == "__main__":
                 cv_scaler = int(input("What do you want to set the CV Scaler to? (must be a whole number): "))
                 print(f"Set CV Scaler to {cv_scaler}")
             elif inp == "people":
-                # TODO: implement
-                print("TESTING PEOPLE")
+                print("Here are the people I have saved")
+                for person in people:
+                    print("------------------")
+                    person.print_info()
             elif inp == "capture" or inp == "capt":
                 person_name = Person.get_aggregate_name(input("Who's pictures am I taking (full name)?: "))
-                person_i, person = Person.get_person(known_people, person_name)
+                person = Person.get_person(people, person_name)
                 if not person:
                     inp = input("That person is not yet saved. Do you want me to add them (y/n)?: ")
                     if inp != "y" and inp != "Y":
                         continue
 
-                    known_people.append(Person(person_name))
+                    people.append(Person(person_name))
 
                 capture_photos(person_name, cam, CAM_I, hardware)
                 cam = clean_up(cam) # TODO: review if cam is mutable and altered by clean_up for both rpi and macOS (so that clean_up can be done from any function and not in the main one)
+                # train_model()
                 print("Enter 'train' to train the model on the new pictures")
             elif inp == "train":
                 cam = clean_up(cam)
                 train_model()
-                load_encodings(known_people, True)
+                Person.load_encodings(people, True)
             elif inp == "reco" or inp == "recognize":
-                current_person = get_current_person(cam, CAM_I, hardware, known_people)
-                print(f"Current Person is {current_person}")
+                current_person = get_current_person(cam, CAM_I, hardware, people)
+                if current_person:
+                    print("Current person is:")
+                    current_person.print_info()
             elif inp == "preview" or inp == "prev":
                 # Get and process frame
-                live_preview(cam, CAM_I,  known_people, cv_scaler)
+                live_preview(cam, CAM_I,  people, cv_scaler)
                 cam = clean_up(cam)
             elif inp == "clean":
                 cam = clean_up(cam)
@@ -89,6 +95,9 @@ if __name__ == "__main__":
                 print(f"{inp} is not a valid option, try something else")
     except KeyboardInterrupt:
         pass
+
+    print("Saving Changes to People")
+    Person.save_people_to_file(people)
 
     print("\nCleaning things up")
     cam = clean_up(cam)

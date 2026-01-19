@@ -3,3 +3,4 @@ dataset/
 venv/
 .DS_Store
 encodings.pickle
+people.pickle

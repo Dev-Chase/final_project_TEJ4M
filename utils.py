@@ -28,11 +28,6 @@ def create_folder(folder_path):
 #   - each name has a list of associated encodings
 #   - format is like this for the file itself {"encodings": [{"name": name, "encodings": [encodings]}]}
 
-
-# NOTE: overrides current people (a change during execution will overwrite another)
-# def save_people_to_file(known_people):
-#     pass
-
 def init_camera(cam, CAM_I):
     if not (not cam):
         return cam
