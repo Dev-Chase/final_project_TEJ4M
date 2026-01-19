@@ -6,10 +6,9 @@ from utils import *
 
 # TODO: move to person.py
 def create_person_folder(name):
-    dataset_folder = "dataset"
-    create_folder(dataset_folder)
+    create_folder(DATASET_FOLDER)
     
-    person_folder = os.path.join(dataset_folder, name)
+    person_folder = os.path.join(DATASET_FOLDER, name)
     create_folder(person_folder)
     return person_folder
 

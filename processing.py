@@ -21,12 +21,15 @@ def process_frame(frame, known_people, cv_scaler = CV_SCALER):
     
     face_people = []
     for face_encoding in face_encodings:
-        tolerance = 0.6
+        tolerance = 0.4
 
         # Find the person with the closest looking face
         lowest_distance = tolerance + 0.1
         current_match = None
         for person in known_people:
+            if len(person.encodings) == 0:
+                continue
+
             person_min_distance = min(face_recognition.face_distance(person.encodings, face_encoding))
             if person_min_distance < lowest_distance:
                 lowest_distance = person_min_distance
@@ -42,42 +45,3 @@ def process_frame(frame, known_people, cv_scaler = CV_SCALER):
 
     return face_locations, face_encodings, face_people
 
-def get_current_person(cam, CAM_I, hardware, known_people, cv_scaler=VERIFICATION_CV_SCALER):
-    cam = init_camera(cam, CAM_I)
-    time.sleep(1.0)
-    start_time = time.time()
-
-    # Get and process the current frame
-    frame = capture_frame(cam, CAM_I)
-    _, _, face_people = process_frame(frame, known_people, cv_scaler)
-
-    print(f"Original People: {face_people}")
-    last_face_people = face_people
-
-    while time.time() - start_time < VERIFICATION_TIME:
-        # Get and process the current frame
-        frame = capture_frame(cam, CAM_I)
-        _, _, face_people = process_frame(frame, known_people, cv_scaler)
-        print(face_people)
-
-        # Check for invalidations of the current verification
-        if len(face_people) == 0:
-            print("I couldn't detect anyone in the frame.")
-            hardware.fail_sound()
-            return None
-
-        if len(face_people) > 1:
-            print("Only one person in frame at a time please.")
-            hardware.fail_sound()
-            return None
-
-        if last_face_people != face_people:
-            print("Something changed while I was verifying, please try again.")
-            hardware.fail_sound()
-            return None
-
-        last_face_people = face_people
-
-    hardware.set_lights(False, True)
-    hardware.success_sound()
-    return face_people[0]

@@ -2,12 +2,15 @@ from capturing import capture_photos
 import pickle
 from utils import *
 
+#TODO: write about problem with using the same array from the pickle file for all instances of a person
 class Person:
     def __init__(self, aggregate_name, info=[], encodings=[]):
         self.aggregate_name = aggregate_name
         self.first_name, self.last_name = self.get_separate_names()
-        self.info = info
-        self.encodings = encodings
+        self.info = []
+        self.info.extend(info)
+        self.encodings = []
+        self.encodings.extend(encodings)
 
     # Data Management
     @staticmethod
@@ -35,9 +38,11 @@ class Person:
                 known_people.append(person)
 
             if override:
-                person.encodings = person_dict["encodings"]
-            else:
-                person.encodings = person.encodings + person_dict["encodings"]
+                person.encodings.clear()
+            person.encodings.extend(person_dict["encodings"])
+
+    def get_encodings_folder(self):
+        return os.path.join(DATASET_FOLDER, self.aggregate_name)
 
     def get_person_dict(self):
         return {"name": self.aggregate_name, "info": self.info}
@@ -80,6 +85,19 @@ class Person:
     def print_info(self):
         print(f"Name:{self.get_full_name_text()}")
         print(f"Info: {self.info}")
+        print(f"N Encodings: {len(self.encodings)}")
+
+    # Groups
+    def add_to_group(self, group):
+        group.add_member(self.aggregate_name)
+        self.info.append(group.code)
+
+    # Info
+    def add_info(self, info):
+        self.info.append(info)
+
+    def is_threat(self):
+        return "threat" in self.info
 
     # Pictures
     def take_pictures(self, cam, CAM_I, hardware):

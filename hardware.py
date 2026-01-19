@@ -1,5 +1,5 @@
 from utils import *
-from gpiozero import LED, TonalBuzzer
+from gpiozero import LED, TonalBuzzer, Button
 from gpiozero.devices import Device
 from gpiozero.pins.mock import MockFactory
 from gpiozero.tones import Tone
@@ -7,17 +7,21 @@ import time
 
 # TODO: consider setting up i2c RGB LCD for feedback
 class Hardware():
-    def __init__(self, red_pin=14, green_pin=15, buzzer_pin=18, testing=False):
+    def __init__(self, red_pin=14, green_pin=15, buzzer_pin=18, btn_pin=23, testing=False):
         if testing:
             Device.pin_factory = MockFactory()
 
         self.red_light = LED(red_pin)
         self.green_light = LED(green_pin)
         self.set_lights(False, False)
+        self.btn = Button(btn_pin)
         try:
             self.buzzer = TonalBuzzer(buzzer_pin)
         except Exception:
             pass
+
+    def is_mock(self):
+        return isinstance(Device.pin_factory, MockFactory)
 
     def set_lights(self, red, green):
         if red:

@@ -7,6 +7,7 @@ import time
 CV_SCALER = 5
 ENCODINGS_FILE = "encodings.pickle"
 PEOPLE_DATA_FILE = "people.pickle"
+DATASET_FOLDER = "dataset"
 
 #TODO: consider using classes
 
