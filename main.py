@@ -1,6 +1,7 @@
 from hardware import Hardware
 from capturing import *
 from training import *
+from person import Person
 from processing import *
 from utils import *
 from viewing import live_preview
@@ -20,11 +21,15 @@ def print_options():
     print("break/exit/stop - Stop the Program")
 
 if __name__ == "__main__":
+    # Get Information on People
+    known_people = []
+    if Path(PEOPLE_DATA_FILE).is_file():
+        Person.load_people_from_file(known_people)
+
     # Load pre-trained face encodings
-    if not Path(ENCODINGS_FILE_PATH).is_file():
+    if not Path(ENCODINGS_FILE).is_file():
         train_model()
-    known_people = load_people(None, True)
-    # TODO: handle people_data as seen in training.py
+    Person.load_encodings(known_people)
 
     # Initialize Hardware/GPIO
     hardware = Hardware(testing=True) # TODO: remove testing for raspberry pi
@@ -48,16 +53,25 @@ if __name__ == "__main__":
                 cv_scaler = int(input("What do you want to set the CV Scaler to? (must be a whole number): "))
                 print(f"Set CV Scaler to {cv_scaler}")
             elif inp == "people":
-                known_people = load_people(known_people)
-                print()
+                # TODO: implement
+                print("TESTING PEOPLE")
             elif inp == "capture" or inp == "capt":
-                capture_photos(cam, CAM_I, hardware)
+                person_name = Person.get_aggregate_name(input("Who's pictures am I taking (full name)?: "))
+                person_i, person = Person.get_person(known_people, person_name)
+                if not person:
+                    inp = input("That person is not yet saved. Do you want me to add them (y/n)?: ")
+                    if inp != "y" and inp != "Y":
+                        continue
+
+                    known_people.append(Person(person_name))
+
+                capture_photos(person_name, cam, CAM_I, hardware)
                 cam = clean_up(cam) # TODO: review if cam is mutable and altered by clean_up for both rpi and macOS (so that clean_up can be done from any function and not in the main one)
-                print("Enter 'train' to train the model on the pictures")
+                print("Enter 'train' to train the model on the new pictures")
             elif inp == "train":
                 cam = clean_up(cam)
                 train_model()
-                known_people = load_people(known_people, True)
+                load_encodings(known_people, True)
             elif inp == "reco" or inp == "recognize":
                 current_person = get_current_person(cam, CAM_I, hardware, known_people)
                 print(f"Current Person is {current_person}")
@@ -75,9 +89,7 @@ if __name__ == "__main__":
                 print(f"{inp} is not a valid option, try something else")
     except KeyboardInterrupt:
         pass
-    except Exception:
-        print("Something unexpected happened!")
 
-    print("Cleaning things up")
+    print("\nCleaning things up")
     cam = clean_up(cam)
 

@@ -1,12 +1,12 @@
 import cv2
 import os
 # import picamera2
-import pickle
 import sys
 import time
 
 CV_SCALER = 5
-ENCODINGS_FILE_PATH = "encodings.pickle"
+ENCODINGS_FILE = "encodings.pickle"
+PEOPLE_DATA_FILE = "people.pickle"
 
 #TODO: consider using classes
 
@@ -18,14 +18,20 @@ def create_folder(folder_path):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
-def load_people(known_people=None, override=False):
-    if not known_people or override:
-        print("[INFO] loading encodings...")
-        with open(ENCODINGS_FILE_PATH, "rb") as f:
-            data = pickle.loads(f.read())
-        return data["people"]
+# Imagining that there are two pickle files:
+# One that contains the data for the people themselves
+#   - each name has its own dict with optional titles and other info
+#   - format is like this for the file itself {"people": [{"name": name, "info":[titles/info]}]}
 
-    return known_people
+# NOTE: THIS IS THE ONE WE'RE WORKING WITH IN THIS FILE *THIS ALONE*
+# One that contains the encodings for the people (associated with a name)
+#   - each name has a list of associated encodings
+#   - format is like this for the file itself {"encodings": [{"name": name, "encodings": [encodings]}]}
+
+
+# NOTE: overrides current people (a change during execution will overwrite another)
+# def save_people_to_file(known_people):
+#     pass
 
 def init_camera(cam, CAM_I):
     if not (not cam):

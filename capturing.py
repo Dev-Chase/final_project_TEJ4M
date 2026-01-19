@@ -1,5 +1,7 @@
+import cv2
 from datetime import datetime
 import os
+import time
 from utils import *
 
 # TODO: move to person.py
@@ -11,15 +13,11 @@ def create_person_folder(name):
     create_folder(person_folder)
     return person_folder
 
-def capture_photos(cam, CAM_I, hardware):
+def capture_photos(name, cam, CAM_I, hardware):
     cam = init_camera(cam, CAM_I)
 
     # Name will be formated as firstname_lastname in lowercase
-    name = "_".join(part.lower() for part in input("What is your full name?: ").split())
-    
-    titles = ["threat", "student", "teacher", "other"]
-    title_i = int(input("What is this person's title/status (0:threat, 1:student, 2:teacher, 3:other)?: "))
-    title = titles[title_i]
+    # name = "_".join(part.lower() for part in input("What is your full name?: ").split())
 
     folder = create_person_folder(name)
     print(f"Taking photos for {name}. Press SPACE to capture, 'q' to quit.")

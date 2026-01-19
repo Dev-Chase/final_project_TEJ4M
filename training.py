@@ -9,18 +9,19 @@ from utils import *
 # Imagining that there are two pickle files:
 # One that contains the data for the people themselves
 #   - each name has its own dict with optional titles and other info
-#   - format is like this for the file itself {"people": [{name: {titles}}]}
+#   - format is like this for the file itself {"people": [{"name": name, "info":{titles/info}}]}
 
 # NOTE: THIS IS THE ONE WE'RE WORKING WITH IN THIS FILE *THIS ALONE*
 # One that contains the encodings for the people (associated with a name)
 #   - each name has a list of associated encodings
-#   - format is like this for the file itself {"encodings": [{"name": [encodings]}]}
+#   - format is like this for the file itself {"encodings": [{"name": name, "encodings":  [encodings]}]}
 
-def train_person(name, person_dir):
+def train_person(person_path):
     # print(f"Processing images for {name}")
+    name = person_path.name
     person_dict = {"name": name, "encodings": []}
 
-    person_images = list(paths.list_images(person_dir))
+    person_images = list(paths.list_images(person_path))
     for (i, image_path) in enumerate(person_images):
         print(f"[INFO] processing image {i + 1} for {name}")
         image = cv2.imread(image_path)
@@ -36,28 +37,20 @@ def train_person(name, person_dir):
 
     return person_dict
 
-
-# TODO: fix whole UUID system. Find a wholistic solution and write it all down before implementing it
-
-# TODO: consider using separate pickle file for id->names instead of dict of people with associated encodings and an id and name
 def train_model():
     print("[INFO] start processing faces...")
-    encodings_data = {"people": []}
-    people_data = {}
-    if Path(PEOPLE_DATA_FILE_PATH).is_file():
-        with open(PEOPLE_DATA_FILE_PATH, "rb") as f:
-            people_data = pickle.loads(f.read())
+    encodings_data = {"encodings": []}
 
-    dataset_path = Path("dataset")
+    dataset_dir = "dataset"
+    create_folder(dataset_dir)
+    dataset_path = Path(dataset_dir)
     for person_path in dataset_path.iterdir():
         if person_path.is_dir():
-            name = person_path.name
-            person_dict = train_person(name, person_path)
-            encodings_data["people"].append(person_dict)
-            people_data[person_dict["id"]]["name"] = name
+            person_dict = train_person(person_path)
+            encodings_data["encodings"].append(person_dict)
 
     print("[INFO] serializing encodings...")
-    with open("encodings.pickle", "wb") as f:
+    with open(ENCODINGS_FILE, "wb") as f:
         f.write(pickle.dumps(encodings_data))
 
-    print("[INFO] Training complete. Encodings saved to 'encodings.pickle'")
+    print(f"[INFO] Training complete. Encodings saved to '{ENCODINGS_FILE}'")
