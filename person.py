@@ -81,8 +81,6 @@ class Person:
         print(f"Name:{self.get_full_name_text()}")
         print(f"Info: {self.info}")
 
-    # Titles
-
     # Pictures
     def take_pictures(self, cam, CAM_I, hardware):
         capture_photos(self.aggregate_name, cam, CAM_I, hardware)
