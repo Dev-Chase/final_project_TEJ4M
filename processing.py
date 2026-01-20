@@ -4,7 +4,7 @@ from drawing import draw_results
 
 VERIFICATION_TIME = 3.0 # seconds
 VERIFICATION_CV_SCALER = 2
-VERIFICATION_TOLERANCE = 0.4
+VERIFICATION_TOLERANCE = 0.5
 
 # TODO: reorganize so it goes through person at a time instead of encoding
 
@@ -72,15 +72,16 @@ def verify_person(cam, CAM_I, hardware, known_people, cv_scaler=VERIFICATION_CV_
     frame = capture_frame(cam, CAM_I)
     _, _, face_people = process_frame(frame, known_people, cv_scaler)
 
-    print(f"Original People: {face_people}")
+    print(f"Original People: {[person.aggregate_name for person in face_people]}")
     last_face_people = face_people
 
     while time.time() - start_time < VERIFICATION_TIME:
         # Get and process the current frame
         frame = capture_frame(cam, CAM_I)
-        face_locations, _, face_people = process_frame(frame, known_people, cv_scaler, VERIFICATION_TOLERANCE)
+        face_locations, _, face_people = process_frame(frame, known_people, cv_scaler, 5)
 
-        draw_results(frame, face_locations, face_people, cv_scaler, colours["green"])
+        draw_results(frame, face_locations, face_people, cv_scaler)
+        print([person.aggregate_name for person in face_people])
 
         # Check for invalidations of the current verification
         if len(face_people) == 0:
@@ -100,6 +101,7 @@ def verify_person(cam, CAM_I, hardware, known_people, cv_scaler=VERIFICATION_CV_
 
         # Display the frame
         cv2.imshow("Attendance", frame)
+        cv2.waitKey(1) # Let OpenCV Process the Event
 
         last_face_people = face_people
 

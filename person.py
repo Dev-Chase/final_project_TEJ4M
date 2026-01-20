@@ -56,6 +56,7 @@ class Person:
     # NOTE: overwrites current people data (assuming that changes aren't made mid execution that aren't reflected in the program's representation of the data)
     @staticmethod
     def save_people_to_file(people):
+        print("Saving Changes to People")
         people_data = {"people": []}
         for person in people:
             people_data["people"].append(person.get_person_dict())
@@ -112,8 +113,8 @@ class Person:
                 associated_group.members.append(self.aggregate_name)
 
     def add_to_group(self, group):
-        group.add_member(self.aggregate_name)
-        self.info.append(group.code)
+        if group.add_member(self.aggregate_name):
+            self.info.append(group.code)
 
     # Info
     def add_info(self, info):

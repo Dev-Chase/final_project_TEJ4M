@@ -5,3 +5,4 @@ venv/
 encodings.pickle
 people.pickle
 old/
+cloud_project_key.json

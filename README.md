@@ -10,6 +10,7 @@
         * si ça demande pour exécuter un commande git, éxecute-la, ensuite installer _setuptools_ avec **_pip install setuptools_**
     * gpiozero
     * imutils
+    * google_cloud_firestore
 
 ## Exécution
 * Exécuter __*python main.py*__

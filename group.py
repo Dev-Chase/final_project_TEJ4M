@@ -1,4 +1,3 @@
-from hardware import Hardware
 from processing import process_frame, verify_person
 import time
 from utils import *
@@ -24,7 +23,19 @@ class Group:
             print("Present")
 
     def add_member(self, name):
+        if name in self.members:
+            print(f"{name} is already a member of {self.code}")
+            return False
+
         self.members.append(name)
+        return True
+
+    def remove_member(self, name):
+        if not name in self.members:
+            print(f"{name} is not a member of {self.code}")
+            return
+
+        self.members.pop(self.members.index(name))
 
     # TODO: consider adding separate function to justify an absence
     def take_attendance(self, cam, CAM_I, known_people, hardware, start_time, end_time, justified_people=[], cv_scaler=CV_SCALER):
@@ -72,6 +83,7 @@ class Group:
                     print(f"{person.get_full_name_text()} has already taken attendance.")
                     continue
                 
+                # TODO: consider playing a sound here according to the code
                 code = "P"
                 if check_in_time > start_time:
                     code = "R"
@@ -83,5 +95,10 @@ class Group:
 
         print("This is my attendance sheet:")
         print(attendance_info)
-        return attendance_info
+        return {
+            "group": self.code,
+            "session_start": get_formatted_time(start_time, True),
+            "session_end": get_formatted_time(end_time, True),
+            "attendance": attendance_info,
+        }
 
