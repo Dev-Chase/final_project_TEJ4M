@@ -9,6 +9,14 @@ ENCODINGS_FILE = "encodings.pickle"
 PEOPLE_DATA_FILE = "people.pickle"
 DATASET_FOLDER = "dataset"
 
+# Data (BGR)
+colours = {
+    "red": (0, 0, 255),
+    "green": (0, 255, 0),
+    "blue": (244, 42, 3),
+    "white": (255, 255, 255)
+}
+
 #TODO: consider using classes
 
 # TODO: Separate files according to these categories:
@@ -18,6 +26,15 @@ DATASET_FOLDER = "dataset"
 def create_folder(folder_path):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
+
+def get_formatted_time(given_time, date=False):
+    local_time = time.localtime(given_time)
+    if date:
+        format_str = "%Y-%m-%d %H:%M:%S"
+    else:
+        format_str = "%H:%M:%S"
+    return time.strftime(format_str, local_time)
+
 
 # Imagining that there are two pickle files:
 # One that contains the data for the people themselves
@@ -79,16 +96,6 @@ def capture_frame(cam, CAM_I):
     # For Raspberry Pi:
     # frame = picam2.capture_array()
     # return frame
-
-# Returns frame_count, start_time, fps
-def calculate_fps(frame_count, start_time, fps):
-    frame_count = frame_count + 1
-    elapsed_time = time.time() - start_time
-    if elapsed_time > 1:
-        fps = frame_count / elapsed_time
-        frame_count = 0
-        start_time = time.time()
-    return frame_count, start_time, fps
 
 def clear_console():
     if os.name == 'nt':

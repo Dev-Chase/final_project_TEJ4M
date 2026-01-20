@@ -5,7 +5,6 @@ from gpiozero.pins.mock import MockFactory
 from gpiozero.tones import Tone
 import time
 
-# TODO: consider setting up i2c RGB LCD for feedback
 class Hardware():
     def __init__(self, red_pin=14, green_pin=15, buzzer_pin=18, btn_pin=23, testing=False):
         if testing:

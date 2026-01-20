@@ -1,5 +1,6 @@
 from capturing import capture_photos
 import pickle
+from group import Group
 from utils import *
 
 #TODO: write about problem with using the same array from the pickle file for all instances of a person
@@ -14,13 +15,18 @@ class Person:
 
     # Data Management
     @staticmethod
-    def load_people_from_file(people_arr):
+    def load_people_from_file(people_arr, group_arr):
+        group_arr.clear()
+
         print("[INFO] loading people...")
         with open(PEOPLE_DATA_FILE, "rb") as f:
             people_data = pickle.loads(f.read())
 
-        for person in people_data["people"]:
-            people_arr.append(Person(person["name"], person["info"]))
+        for person_dict in people_data["people"]:
+            # Add Person to Person Array
+            person_obj = Person(person_dict["name"], person_dict["info"])
+            person_obj.add_to_associated_groups(group_arr)
+            people_arr.append(person_obj)
 
     @staticmethod
     def load_encodings(known_people, override=True):
@@ -75,11 +81,14 @@ class Person:
 
     # Helper
     @staticmethod
-    def get_person(people, name):
+    def get_person(people, name, inp_str=None):
+        if inp_str:
+            name = Person.get_aggregate_name(input(inp_str))
         for person in people:
             if person.has_same_name(name):
                 return person
         
+        print(f"{name} isn't saved")
         return None
 
     def print_info(self):
@@ -88,6 +97,20 @@ class Person:
         print(f"N Encodings: {len(self.encodings)}")
 
     # Groups
+    def add_to_associated_groups(self, group_arr):
+        for label in self.info:
+            associated_group = None
+            for group in group_arr:
+                if group.code == label:
+                    associated_group = group
+            
+            if not associated_group:
+                associated_group = Group(label)
+                group_arr.append(associated_group)
+
+            if not self.aggregate_name in associated_group.members:
+                associated_group.members.append(self.aggregate_name)
+
     def add_to_group(self, group):
         group.add_member(self.aggregate_name)
         self.info.append(group.code)
