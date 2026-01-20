@@ -13,18 +13,21 @@ from utils import *
 def print_options():
     print("--------------------------------")
     print("Options:")
-    print("ls/list - List options")
-    print("cv - Set the CV Scaler (how much the image is scaled down)")
-    print("people - See the currently saved people")
-    print("add to - Add a person to a group")
-    print("rem(ove) from - Remove a person from a group")
-    print("rem(ove) - Remove a person from the dataset")
-    print("capt(ure) - Take photos for a person to train the model on their face")
-    print("train - Train the model on the faces in the dataset folder")
-    print("save - Save People Information")
-    print("prev(iew) - Show a live preview of all the people in frame")
-    print("clean - Close all windows and Stop Camera")
-    print("clear - Clear the console")
+    print("ls/list         - List options")
+    print("cv              - Set the CV Scaler (how much the image is scaled down)")
+    print("people          - See the currently saved people")
+    print("person          - Search for a Saved Person")
+    print("groups          - See the Currently Saved Groups")
+    print("group           - Search for a Saved Group")
+    print("add to          - Add a person to a group or groups")
+    print("rem(ove) from   - Remove a person from a group or groups")
+    print("rem(ove)        - Remove a person from the dataset")
+    print("capt(ure)       - Take photos for a person to train the model on their face")
+    print("train           - Train the model on the faces in the dataset folder")
+    print("save            - Save People Information")
+    print("prev(iew)       - Show a live preview of all the people in frame")
+    print("clean           - Close all windows and Stop Camera")
+    print("clear           - Clear the console")
     print("break/exit/stop - Stop the Program")
 
 if __name__ == "__main__":
@@ -72,14 +75,15 @@ if __name__ == "__main__":
             elif inp == "cv":
                 cv_scaler = int(input("What do you want to set the CV Scaler to? (must be a whole number): "))
                 print(f"Set CV Scaler to {cv_scaler}")
+
             elif inp == "att" or inp == "attendance":
-                group_name = input("Which group do you want to take attendance for?: ")
+                given_groups = input("Which group do you want to take attendance for?: ")
                 group_names = [group.code for group in groups]
-                if not group_name in group_names:
+                if not given_groups in group_names:
                     print("That group doesn't exist")
                     continue
 
-                group = groups[group_names.index(group_name)]
+                group = groups[group_names.index(given_groups)]
                 ex_start_time = time.time() + 10
                 ex_end_time = time.time() + 25 # One minute from now
                 attendance_info = group.take_attendance(cam, CAM_I, people, hardware, ex_start_time, ex_end_time, cv_scaler=cv_scaler)
@@ -90,42 +94,69 @@ if __name__ == "__main__":
                 if inp != "Y" and inp != "y":
                     continue
                 cloud.log_attendance(attendance_info)
+
             elif inp == "people":
-                print("Here are the people I have saved")
+                print("Here are the currently saved people:")
                 for person in people:
-                    print("------------------")
                     person.print_info()
+
+            elif inp == "person":
+                person = Person.get_person(people, None, "Who are you searching for (full name)?: ")
+                if not person:
+                    continue
+                person.print_info()
+
+            elif inp == "groups":
+                print("-----------------------")
+                print("Here are the currently saved groups:")
+                for group in groups:
+                    print(f"\t{group.code}")
+
+            elif inp == "group":
+                group_name = input("What group are you searching for?: ")
+                group_names = [group.code for group in groups]
+                if not group_name in group_names:
+                    print(f"{group_name} is not a saved group")
+                    continue
+
+                group = groups[group_names.index(group_name)]
+                group.print_info()
+
+
             elif inp == "add to":
                 person = Person.get_person(people, None, "Who do you want to add to the group (full name)?: ")
                 if not person:
                     continue
 
-                label = input(f"What group do you want to add {person.get_full_name_text()} to?: ")
-                group_names = [group.code for group in groups]
-                if not label in group_names:
-                    groups.append(Group(label))
-                group_names = [group.code for group in groups]
+                given_groups = input(f"What group(s) do you want to add {person.get_full_name_text()} to?: ").split()
+                for given_group in given_groups:
+                    group_names = [group.code for group in groups]
+                    if not given_group in group_names:
+                        groups.append(Group(given_group))
+                    group_names = [group.code for group in groups]
 
-                group = groups[group_names.index(label)]
-                person.add_to_group(group)
+                    group = groups[group_names.index(given_group)]
+                    person.add_to_group(group)
+
             elif inp == "rem from" or inp == "remove from":
                 person = Person.get_person(people, None, "Who do you want to remove from the group (full name)?: ")
                 if not person:
                     continue
 
-                group_name = input("What group do you want to remove them from?: ")
-                if not group_name in person.info:
-                    print(f"{person.get_full_name_text()} is not associated with {group_name}")
-                    continue
-                person.info.pop(person.info.index(group_name))
+                given_groups = input("What group do you want to remove them from?: ").split()
+                for given_group in given_groups:
+                    if not given_group in person.info:
+                        print(f"{person.get_full_name_text()} is not associated with {given_group}")
+                        continue
+                    person.info.pop(person.info.index(given_group))
 
-                group_names = [group.code for group in groups]
-                if not group_name in group_names:
-                    print(f"{group_name} doesn't exist")
-                    continue
+                    group_names = [group.code for group in groups]
+                    if not given_group in group_names:
+                        print(f"{given_group} doesn't exist")
+                        continue
 
-                group = groups[group_names.index(group_name)]
-                group.remove_member(person.aggregate_name)
+                    group = groups[group_names.index(given_group)]
+                    group.remove_member(person.aggregate_name)
 
             elif inp == "rem" or inp == "remove":
                 print(f"Input: {inp}")
@@ -145,6 +176,7 @@ if __name__ == "__main__":
                 people.pop(person_i)
                 print("Retraining Model")
                 train_model()
+
             elif inp == "capture" or inp == "capt":
                 person_name = Person.get_aggregate_name(input("Who's pictures am I taking (full name)?: "))
                 person = Person.get_person(people, person_name)
@@ -156,33 +188,34 @@ if __name__ == "__main__":
                     people.append(Person(person_name))
 
                 capture_photos(person_name, cam, CAM_I, hardware)
-                cam = clean_up(cam) # TODO: review if cam is mutable and altered by clean_up for both rpi and macOS (so that clean_up can be done from any function and not in the main one)
-                # train_model()
+                cam = clean_up(cam)
                 print("Enter 'train' to train the model on the new pictures")
+
             elif inp == "train":
                 cam = clean_up(cam)
                 train_model()
                 Person.load_encodings(people, True)
-            # TODO: consider removing
-            # elif inp == "reco" or inp == "recognize":
-            #     current_person = get_current_person(cam, CAM_I, hardware, people)
-            #     if current_person:
-            #         print("Current person is:")
-            #         current_person.print_info()
+
             elif inp == "preview" or inp == "prev":
                 # Get and process frame
                 live_preview(cam, CAM_I,  people, cv_scaler)
                 cam = clean_up(cam)
+
             elif inp == "save":
                 Person.save_people_to_file(people)
+
             elif inp == "clean":
                 cam = clean_up(cam)
+
             elif inp == "clear":
                 clear_console()
+
             elif inp == "break" or inp == "exit" or inp == "stop":
                 break
+
             else:
                 print(f"{inp} is not a valid option, try something else")
+
     except KeyboardInterrupt:
         pass
 

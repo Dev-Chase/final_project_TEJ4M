@@ -93,6 +93,7 @@ class Person:
         return None
 
     def print_info(self):
+        print("-------------------")
         print(f"Name:{self.get_full_name_text()}")
         print(f"Info: {self.info}")
         print(f"N Encodings: {len(self.encodings)}")

@@ -22,6 +22,11 @@ class Group:
         elif at_code == "P":
             print("Present")
 
+    def print_info(self):
+        print("-------------------")
+        print(f"Name/Code: {self.code}")
+        print(f"Members: {self.members}")
+
     def add_member(self, name):
         if name in self.members:
             print(f"{name} is already a member of {self.code}")
