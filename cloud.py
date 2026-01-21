@@ -10,4 +10,5 @@ class Cloud():
 
     def log_attendance(self, attendance_info):
         print("Saving attendance sheet to Google Cloud")
+        attendance_info["upload_time"] = firestore.SERVER_TIMESTAMP
         self.db.collection("attendance_sheets").add(attendance_info)

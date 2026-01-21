@@ -4,13 +4,13 @@ from drawing import draw_results
 
 VERIFICATION_TIME = 3.0 # seconds
 VERIFICATION_CV_SCALER = 2
-VERIFICATION_TOLERANCE = 0.5
+VERIFICATION_TOLERANCE = 0.45
 
 # TODO: reorganize so it goes through person at a time instead of encoding
 
 # NOTE: Returns face_locations, face_encodings, and face_names
 # cv_scaler must be a whole number
-def process_frame(frame, known_people, cv_scaler = CV_SCALER, tolerance=0.6):
+def process_frame(frame, known_people, cv_scaler = CV_SCALER, tolerance=0.5):
     # Resize the frame using cv_scaler to increase performance (less pixels processed, less time spent)
     resized_frame = cv2.resize(frame, (0, 0), fx = (1/cv_scaler), fy = (1/cv_scaler))
     
@@ -72,7 +72,7 @@ def verify_person(cam, CAM_I, hardware, known_people, cv_scaler=VERIFICATION_CV_
     frame = capture_frame(cam, CAM_I)
     _, _, face_people = process_frame(frame, known_people, cv_scaler)
 
-    print(f"Original People: {[person.aggregate_name for person in face_people]}")
+    print(f"Original People: {[person.aggregate_name for person in face_people if person]}")
     last_face_people = face_people
 
     while time.time() - start_time < VERIFICATION_TIME:
@@ -81,7 +81,7 @@ def verify_person(cam, CAM_I, hardware, known_people, cv_scaler=VERIFICATION_CV_
         face_locations, _, face_people = process_frame(frame, known_people, cv_scaler, 5)
 
         draw_results(frame, face_locations, face_people, cv_scaler)
-        print([person.aggregate_name for person in face_people])
+        print([person.aggregate_name for person in face_people if person])
 
         # Check for invalidations of the current verification
         if len(face_people) == 0:

@@ -194,7 +194,9 @@ if __name__ == "__main__":
             elif inp == "train":
                 cam = clean_up(cam)
                 train_model()
-                Person.load_encodings(people, True)
+                for person in people:
+                    person.encodings.clear()
+                Person.load_encodings(people)
 
             elif inp == "preview" or inp == "prev":
                 # Get and process frame
