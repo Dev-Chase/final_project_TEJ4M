@@ -3,7 +3,6 @@ import pickle
 from group import Group
 from utils import *
 
-#TODO: write about problem with using the same array from the pickle file for all instances of a person
 class Person:
     def __init__(self, aggregate_name, info=[], encodings=[]):
         self.aggregate_name = aggregate_name
@@ -53,7 +52,7 @@ class Person:
     def get_person_dict(self):
         return {"name": self.aggregate_name, "info": self.info}
 
-    # NOTE: overwrites current people data (assuming that changes aren't made mid execution that aren't reflected in the program's representation of the data)
+    # NOTE: overwrites current people data
     @staticmethod
     def save_people_to_file(people):
         print("Saving Changes to People")

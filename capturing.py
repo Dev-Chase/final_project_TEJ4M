@@ -4,7 +4,6 @@ import os
 import time
 from utils import *
 
-# TODO: move to person.py
 def create_person_folder(name):
     create_folder(DATASET_FOLDER)
     

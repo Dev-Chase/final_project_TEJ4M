@@ -6,10 +6,7 @@ VERIFICATION_TIME = 3.0 # seconds
 VERIFICATION_CV_SCALER = 2
 VERIFICATION_TOLERANCE = 0.45
 
-# TODO: reorganize so it goes through person at a time instead of encoding
-
 # NOTE: Returns face_locations, face_encodings, and face_names
-# cv_scaler must be a whole number
 def process_frame(frame, known_people, cv_scaler = CV_SCALER, tolerance=0.5):
     # Resize the frame using cv_scaler to increase performance (less pixels processed, less time spent)
     resized_frame = cv2.resize(frame, (0, 0), fx = (1/cv_scaler), fy = (1/cv_scaler))

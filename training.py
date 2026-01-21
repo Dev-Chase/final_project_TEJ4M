@@ -5,17 +5,6 @@ from pathlib import Path
 import pickle
 from utils import *
 
-
-# Imagining that there are two pickle files:
-# One that contains the data for the people themselves
-#   - each name has its own dict with optional titles and other info
-#   - format is like this for the file itself {"people": [{"name": name, "info":{titles/info}}]}
-
-# NOTE: THIS IS THE ONE WE'RE WORKING WITH IN THIS FILE *THIS ALONE*
-# One that contains the encodings for the people (associated with a name)
-#   - each name has a list of associated encodings
-#   - format is like this for the file itself {"encodings": [{"name": name, "encodings":  [encodings]}]}
-
 def train_person(person_path):
     # print(f"Processing images for {name}")
     name = person_path.name

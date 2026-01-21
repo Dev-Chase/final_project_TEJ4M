@@ -1,6 +1,4 @@
-from capturing import *
 from cloud import Cloud
-from drawing import *
 from group import Group
 from hardware import Hardware
 import os
@@ -56,8 +54,6 @@ if __name__ == "__main__":
 
     cv_scaler = CV_SCALER
 
-    # TODO: add removing someone from a group
-    
     # Input Loop
     try:
         print("Enter 'list' to list options")
@@ -66,12 +62,14 @@ if __name__ == "__main__":
 
             if inp == "list" or inp == "ls":
                 print_options()
-            #TODO: remove this option
+                 
+            # TODO: remove this option
             elif inp == "empty":
                 for person in people:
                     person.info.clear()
                 for group in groups:
                     group.members.clear()
+                     
             elif inp == "cv":
                 cv_scaler = int(input("What do you want to set the CV Scaler to? (must be a whole number): "))
                 print(f"Set CV Scaler to {cv_scaler}")
@@ -185,9 +183,10 @@ if __name__ == "__main__":
                     if inp != "y" and inp != "Y":
                         continue
 
-                    people.append(Person(person_name))
+                    person = Person(person_name)
+                    people.append(person)
 
-                capture_photos(person_name, cam, CAM_I, hardware)
+                person.take_pictures(cam, CAM_I, hardware)
                 cam = clean_up(cam)
                 print("Enter 'train' to train the model on the new pictures")
 

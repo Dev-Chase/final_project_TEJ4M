@@ -94,7 +94,6 @@ class Group:
                     code = "R"
                 attendance_info[person.aggregate_name] = {"code": code, "time": get_formatted_time(check_in_time, date=True)}
 
-            # TODO: remove q key break or add a way to come back if ended prematurily?
             if key == ord('q'):  # Q key
                 break
 

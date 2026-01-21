@@ -17,11 +17,6 @@ colours = {
     "white": (255, 255, 255)
 }
 
-#TODO: consider using classes
-
-# TODO: Separate files according to these categories:
-# The CLI, the inital image capturing, the model training, the verification of a person, hardware interaction (this last one can be incoporated into others if necessary), CSV or cloud stuff if being done
-
 # Camera and General Running
 def create_folder(folder_path):
     if not os.path.exists(folder_path):
@@ -35,16 +30,6 @@ def get_formatted_time(given_time, date=False):
         format_str = "%H:%M:%S"
     return time.strftime(format_str, local_time)
 
-
-# Imagining that there are two pickle files:
-# One that contains the data for the people themselves
-#   - each name has its own dict with optional titles and other info
-#   - format is like this for the file itself {"people": [{"name": name, "info":[titles/info]}]}
-
-# NOTE: THIS IS THE ONE WE'RE WORKING WITH IN THIS FILE *THIS ALONE*
-# One that contains the encodings for the people (associated with a name)
-#   - each name has a list of associated encodings
-#   - format is like this for the file itself {"encodings": [{"name": name, "encodings": [encodings]}]}
 
 def init_camera(cam, CAM_I):
     if not (not cam):
