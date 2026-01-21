@@ -34,7 +34,7 @@ class Hardware():
             self.green_light.off()
 
     def fail_sound(self):
-        if isinstance(Device.pin_factory, MockFactory):
+        if self.is_mock():
             print("I played the fail sound!")
         else:
             tune = ["E5", "C5", "A4"]
@@ -45,7 +45,7 @@ class Hardware():
             self.buzzer.stop()
 
     def success_sound(self):
-        if isinstance(Device.pin_factory, MockFactory):
+        if self.is_mock():
             print("I played the success sound!")
         else:
             tune = ["C5", "E5", "G5"]

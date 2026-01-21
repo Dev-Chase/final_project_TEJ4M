@@ -42,7 +42,6 @@ class Group:
 
         self.members.pop(self.members.index(name))
 
-    # TODO: consider adding separate function to justify an absence
     def take_attendance(self, cam, CAM_I, known_people, hardware, start_time, end_time, justified_people=[], cv_scaler=CV_SCALER):
         cam = init_camera(cam, CAM_I)
 

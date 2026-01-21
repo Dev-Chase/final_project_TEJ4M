@@ -12,7 +12,9 @@ def print_options():
     print("--------------------------------")
     print("Options:")
     print("ls/list         - List options")
+    print("empty           - Clear all person information")
     print("cv              - Set the CV Scaler (how much the image is scaled down)")
+    print("att(endance)    - Take attendance for a group")
     print("people          - See the currently saved people")
     print("person          - Search for a Saved Person")
     print("groups          - See the Currently Saved Groups")
@@ -63,7 +65,6 @@ if __name__ == "__main__":
             if inp == "list" or inp == "ls":
                 print_options()
                  
-            # TODO: remove this option
             elif inp == "empty":
                 for person in people:
                     person.info.clear()

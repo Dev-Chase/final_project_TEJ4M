@@ -37,12 +37,12 @@ def init_camera(cam, CAM_I):
 
     # Initialize the camera
     # For Raspberry Pi:
-    # picam2 = Picamera2()
-    # picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (1920, 1080)}))
-    # picam2.start()
+    # cam = Picamera2()
+    # cam.configure(cam.create_preview_configuration(main={"format": 'XRGB8888', "size": (1920, 1080)}))
+    # cam.start()
     # time.sleep(2)
 
-    # return picam2
+    # return cam
 
     # For macOS:
     cam = cv2.VideoCapture(CAM_I)
@@ -56,14 +56,15 @@ def clean_up(cam):
     cv2.destroyAllWindows()
     cv2.waitKey(1) # Let OpenCV process the window close event
 
+    # For Raspberry Pi:
+    # return cam
+
+
+    # For macOS:
     if not cam:
         return
 
-    # For macOS:
     cam.release()
-
-    # For Raspberry Pi:
-    # picam2.stop()
 
     return None
 
@@ -79,7 +80,7 @@ def capture_frame(cam, CAM_I):
     return frame
 
     # For Raspberry Pi:
-    # frame = picam2.capture_array()
+    # frame = cam.capture_array()
     # return frame
 
 def clear_console():
