@@ -1,6 +1,6 @@
 import cv2
 import os
-# import picamera2
+# from picamera2 import Picamera2 (for Raspberry Pi)
 import sys
 import time
 
@@ -58,7 +58,6 @@ def clean_up(cam):
 
     # For Raspberry Pi:
     # return cam
-
 
     # For macOS:
     if not cam:
